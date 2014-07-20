@@ -1,0 +1,9 @@
+<h2>Learn to substract in base 12!</h2>
+<p></p>
+
+<form id="train_substract" ng-if="isPlaying()" ng-submit="submitAnswer()">
+    <span>{{question.sum}}</span> - <span >{{question.x}}</span> =
+    <input type="text" name="answer" ng-model="question.submittedAnswer"/>
+    <input id="submit" type="submit" value="Submit"/>
+</form>
+<p>{{message}}</p>

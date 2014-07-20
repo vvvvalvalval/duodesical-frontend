@@ -1,8 +1,8 @@
 angular.module('duodesicalApp')
   .factory('base12',[function () {
 
-    var digit10 = 'x';
-    var digit11 = 'y';
+    var digit10 = 'a';
+    var digit11 = 'b';
 
     var digits = ["0","1","2","3","4","5","6","7","8","9",digit10,digit11];
     var digitsValues = {};
@@ -12,8 +12,8 @@ angular.module('duodesicalApp')
 
     function inB12(n){
       return n.toString(12)
-        .replace('a',digit10)
-        .replace('b',digit11);
+        .replace(/a/g,digit10)
+        .replace(/b/g,digit11);
     }
 
     function readInt(s){

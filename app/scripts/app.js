@@ -18,6 +18,10 @@ angular
         templateUrl: 'views/train-add.html',
         controller: 'trainAddController'
       })
+      .when('/train/substract',{
+        templateUrl: 'views/train-substract.html',
+        controller: 'trainSubstractController'
+      })
       .otherwise({
         redirectTo: '/'
       });
