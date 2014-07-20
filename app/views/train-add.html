@@ -1,0 +1,13 @@
+<h2>Learn to add in base 12!</h2>
+<p></p>
+
+<form id="train_add" ng-if="question.answer" ng-submit="submitAnswer()">
+    <span>{{question.x}}</span> + <span>{{question.y}}</span> =
+    <input type="text" name="answer" ng-model="question.submittedAnswer"/>
+    <input id="submit" type="submit" value="Submit"/>
+</form>
+<p>{{message}}</p>
+
+
+        <h2>DEBUG</h2>
+        <p>question : {{question}}</p>
