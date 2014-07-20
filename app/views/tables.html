@@ -1,0 +1,43 @@
+<h1>Operators tables</h1>
+
+<h2>Complement to 10</h2>
+<table class="op_table">
+    <tr>
+        <td class="op_cell-row" ng-repeat="x in data.xs">{{base12.inB12(x)}}</td>
+    </tr>
+    <tr>
+        <td ng-repeat="x in data.xs">{{base12.inB12(base12.readInt("10") - x)}}</td>
+    </tr>
+</table>
+
+<h2>Addition</h2>
+<table class="op_table">
+    <tr>
+        <td class="op_cell-row op_cell-op"> + </td>
+        <td class="op_cell-row" ng-repeat="y in data.ys">
+            {{base12.inB12(y)}}
+        </td>
+    </tr>
+    <tr ng-repeat="x in data.xs">
+        <td class="op_cell-row">{{base12.inB12(x)}}</td>
+        <td ng-repeat="y in data.ys">
+            {{base12.inB12(x + y)}}
+        </td>
+    </tr>
+</table>
+
+<h2>Substraction</h2>
+<table class="op_table">
+    <tr>
+        <td class="op_cell-row op_cell-op"> - </td>
+        <td class="op_cell-row" ng-repeat="y in data.ys">
+            {{base12.inB12(y)}}
+        </td>
+    </tr>
+    <tr ng-repeat="x in data.xs">
+        <td class="op_cell-row">{{base12.inB12(x)}}</td>
+        <td ng-repeat="y in data.ys">
+            {{base12.inB12(x - y)}}
+        </td>
+    </tr>
+</table>

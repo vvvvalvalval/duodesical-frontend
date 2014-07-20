@@ -10,6 +10,9 @@ angular.module('duodesicalApp')
     var question = {
       submittedAnswer : ""
     };
+    $scope.isPlaying = function () {
+      return angular.isDefined(question.answer);
+    };
     function askQuestion (){
       var x = randomNumber(range);
       var y = randomNumber(range);
