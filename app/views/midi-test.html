@@ -1,0 +1,39 @@
+<h2>Settings</h2>
+<form>
+    <div>
+        <label for="channel">channel</label>
+        <select name="" id="channel" ng-model="settings.channel">
+            <option value="{{+i}}"
+                    ng-repeat="i in helpers.channels">
+                {{i}}
+            </option>
+        </select>
+    </div>
+    <div>
+        <label for="volume">volume</label>
+        <input type="text" id="volume"
+                ng-model="settings.volume"/>
+    </div>
+    <div>
+        <label for="note">note</label>
+        <input type="text" id="note"
+               ng-model="settings.note"/>
+    </div>
+    <div>
+        <label for="velocity">velocity</label>
+        <input type="text" id="velocity"
+               ng-model="settings.velocity"/>
+    </div>
+    <div>
+        <label for="delay">delay</label>
+        <input type="text" id="delay"
+               ng-model="settings.delay"/>
+    </div>
+    <div>
+        <label for="duration">duration</label>
+        <input type="text" id="duration"
+               ng-model="settings.duration"/>
+    </div>
+</form>
+
+        <button ng-click="playNote()">PLAY NOTE</button>
