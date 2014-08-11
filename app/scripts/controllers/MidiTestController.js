@@ -1,9 +1,6 @@
 angular.module('duodesicalApp')
-  .controller('MidiTestController',['midi', '$scope', '$log', 'instrument', function (midi, $scope, $log, instrument) {
+  .controller('MidiTestController',['midi', '$scope', '$log', 'loadedMidi', function (midi, $scope, $log, instrument) {
     var m = midi.midi;
-    $log.debug(instrument);
-    $log.debug(instrument === m);
-
     $scope.helpers = {
       channels: (function () {
         var res = [];
@@ -29,7 +26,7 @@ angular.module('duodesicalApp')
       $log.debug("Playing the note : ",s);
 
       m.setVolume(+s.channel, +s.volume);
-      m.noteOn(+s.channel, +s.note, +s.velocity);
+      m.noteOn(+s.channel, +s.note, +s.velocity, +s.delay);
       m.noteOff(+s.channel, +s.note, +s.delay + +s.duration);
     }
   }]);

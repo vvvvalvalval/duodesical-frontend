@@ -3,7 +3,8 @@
 angular
   .module('duodesicalApp', [
     'ngRoute',
-    'duodesicalMIDI'
+    'duodesicalMIDI',
+    'd12calToolbox'
   ])
   .config(['$routeProvider',function ($routeProvider) {
     $routeProvider
@@ -28,8 +29,8 @@ angular
         templateUrl: 'views/midi-test.html',
         controller: 'MidiTestController',
         resolve: {
-          'instrument': ['midi', function (midi) {
-            return midi.loadInstrument('cello');
+          'loadedMidi': ['midi', function (midi) {
+            return midi.loadedMidi;
           }]
         }
       })
