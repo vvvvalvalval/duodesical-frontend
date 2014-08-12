@@ -4,41 +4,52 @@ angular
   .module('duodesicalApp', [
     'ngRoute',
     'duodesicalMIDI',
-    'd12calToolbox'
+    'd12calToolbox',
+    'ui.router'
   ])
-  .config(['$routeProvider',function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .when('/tables',{
-        templateUrl: 'views/tables.html',
-        controller: 'tablesController'
-      })
-      .when('/train/add',{
-        templateUrl: 'views/train-add.html',
-        controller: 'trainAddController'
-      })
-      .when('/train/substract',{
-        templateUrl: 'views/train-substract.html',
-        controller: 'trainSubstractController'
-      })
+  .config(['$stateProvider', '$urlRouterProvider',
+    function ($stateProvider, $urlRouterProvider) {
+      $stateProvider
 
-      .when('/miditest',{
-        templateUrl: 'views/midi-test.html',
-        controller: 'MidiTestController',
-        resolve: {
-          'loadedMidi': ['instruPlayer', function (midi) {
-            return midi.loadedMidi;
-          }]
-        }
-      })
+        .state('sandbox',{
+          url: '/sandbox',
+          template: '<div ui-view></div>'
+        })
+        .state('sandbox.miditest',{
+          url: '/miditest',
+          templateUrl: 'views/midi-test.html',
+          controller: 'MidiTestController',
+          resolve: {
+            'loadedMidi': ['instruPlayer', function (midi) {
+              return midi.loadedMidi;
+            }]
+          }
+        })
 
-      .otherwise({
-        redirectTo: '/'
-      });
-  }])
+        .state('tables',{
+          url: '/tables',
+          templateUrl: 'views/tables.html',
+          controller: 'tablesController'
+        })
+
+        .state('train',{
+          url: '/train',
+          template: '<div ui-view></div>'
+        })
+        .state('train.add',{
+          url: '/add',
+          templateUrl: 'views/train-add.html',
+          controller: 'trainAddController'
+        })
+        .state('train.substract',{
+          url: '/substract',
+          templateUrl: 'views/train-substract.html',
+          controller: 'trainSubstractController'
+        });
+
+      $urlRouterProvider.otherwise('/sandbox/miditest');
+
+    }])
   .run(['instruPlayer', function (midi) {
-    //midi.loadInstrument('acoustic_grand_piano');
+    // starts loading midi files.
   }]);
