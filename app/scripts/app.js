@@ -25,6 +25,10 @@ angular
             }]
           }
         })
+        .state('sandbox.notes',{
+          url: '/notes',
+          templateUrl: 'views/notes-sandbox.html'
+        })
 
         .state('tables',{
           url: '/tables',
