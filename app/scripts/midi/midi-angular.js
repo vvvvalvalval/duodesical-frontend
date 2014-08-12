@@ -1,79 +1,296 @@
-angular.module('duodesicalMIDI', ['d12calToolbox'])
-  .factory('midi', ['$q', '$log', 'd12Utils', function ($q, $log, u) {
+(function () {
 
-    function programNumberFor(instrumentName) {
-      return MIDI.GeneralMIDI.byName[instrumentName].number;
+  /**
+   * Data structure for a set of nonempty strings backed by a linked-list to remember last added elements.
+   * @param elements
+   * @returns an object exposing standard collection methods (all detachable).
+   */
+  function linkedSet(elements) {
+
+    var res = {};
+
+    var count = 0;
+
+    var emptyCell = {
+      s: true
+    };
+    emptyCell.l = emptyCell;
+    emptyCell.r = emptyCell;
+
+    function leftMostCell() {
+      return emptyCell.r;
     }
 
-    function programInstruments(config) {
-      u.forProperty(config)(function (channel, instrumentName) {
-        MIDI.programChange(+channel, programNumberFor(instrumentName));
-      });
+    function rightMostCell() {
+      return emptyCell.l
     }
 
-    var availableInstruments = [
+    function removeCell(cell) {
+      var leftCell = cell.l, rightCell = cell.r;
+      leftCell.r = rightCell;
+      rightCell.l = leftCell;
+    }
+
+    function insertRightTo(leftCell, elem) {
+      var rightCell = leftCell.r;
+      var newCell = {
+        l: leftCell, r: rightCell,
+        e: elem
+      };
+      leftCell.r = newCell;
+      rightCell.l = newCell;
+      positions[elem] = newCell;
+
+      count += 1;
+    }
+
+    var positions = {};
+
+    function remove(elem) {
+      if (positions[elem]) {
+        removeCell(positions[elem]);
+        delete positions[elem];
+        count -= 1;
+        return true;
+      }
+      return false;
+    }
+
+    function size() {
+      return count;
+    }
+
+    function isEmpty() {
+      return count === 0;
+    }
+
+    function contains(elem) {
+      return (positions[elem] ? true : false);
+    }
+
+
+    function addFirst(elem) {
+      remove(elem);
+      insertRightTo(emptyCell, elem);
+      return res;
+    }
+
+    function addLast(elem) {
+      remove(elem);
+      insertRightTo(emptyCell.l, elem);
+      return res;
+    }
+
+    function popFirst() {
+      if (!isEmpty()) {
+        var elem = leftMostCell().e;
+        remove(elem);
+        return elem;
+      }
+    }
+
+    function popLast() {
+      if (!isEmpty()) {
+        var elem = rightMostCell().e;
+        remove(elem);
+        return elem;
+      }
+    }
+
+    function peekFirst() {
+      return leftMostCell().e;
+    }
+
+    function peekLast() {
+      return rightMostCell().e;
+    }
+
+    function toArray() {
+      var arr = [];
+      var cell = leftMostCell();
+      while (!cell.s) {
+        arr.push(cell.e);
+        cell = cell.r;
+      }
+      return arr;
+    }
+
+    if (elements) {
+      elements.forEach(addLast);
+    }
+
+    res.isEmpty = isEmpty;
+    res.size = size;
+    res.contains = contains;
+    res.remove = remove;
+
+    res.addFirst = addFirst;
+    res.addLast = addLast;
+
+    res.popFirst = popFirst;
+    res.popLast = popLast;
+
+    res.peekFirst = peekFirst;
+    res.peekLast = peekLast;
+
+    res.toArray = toArray;
+
+    return res;
+  }
+
+
+  angular.module('duodesicalMIDI', ['d12calToolbox'])
+
+    // number of available MIDI channels.
+    .constant('channelsCount', 16)
+
+    // default loaded instruments.
+    .constant('availableInstruments', [
       "acoustic_grand_piano",
-      //'acoustic_guitar_nylon',
       'acoustic_guitar_steel',
-      //'banjo',
       'cello',
       'church_organ',
+      'distortion_guitar',
+      'flute',
+      'soprano_sax'
+      //,'acoustic_guitar_nylon',
+      //'banjo',
       //'clarinet',
       //'contrabass',
-      'distortion_guitar',
       //'electric_bass_finger',
       //'electric_guitar_clean',
-      'flute',
       //'overdriven_guitar',
-      'soprano_sax',
       //'string_ensemble_1',
       //'synth_drum',
       //'trumpet',
       //'violin'
-    ];
+    ])
 
-    var defaultChannelConfig = (function () {
-      var res = {};
-      for (var i = 0; i < 16; i++) {
-        res["" + i] = availableInstruments[i];
+    .factory('MIDI', ['$window','$log', function ($window,$log) {
+      if(angular.isDefined($window.MIDI)){
+        var MIDI = $window.MIDI;
+        $log.debug("Found MIDI.js global object : ", MIDI);
+        return MIDI;
+      } else {
+        $log.error("MIDI.js global object not found.");
       }
-      return res;
-    }());
+    }])
 
-    function loadInstruments(instrumentNames) {
-      $log.debug("Loading instrument : ", instrumentNames, "...");
+    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils',
+      function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils) {
 
-      var deferredMidi = $q.defer();
-      MIDI.loadPlugin({
-        soundfontUrl: 'scripts/midi/soundfonts/',
-        instruments: instrumentNames,
-        callback: function () {
-          $log.debug("Done loading instrument : ", instrumentNames, "...");
-          $log.debug(MIDI);
-          deferredMidi.resolve(MIDI);
-
-          programInstruments(defaultChannelConfig);
+        var midijsInstrumentByName = MIDI.GeneralMIDI.byName;
+        function programNumberFor(instrumentName) {
+          return midijsInstrumentByName[instrumentName].number;
         }
-      });
 
-      return deferredMidi.promise;
-    }
+        /**
+         * Array mapping each channel number to an instrument name.
+         * Initially set to channelsCount `null` instruments.
+         */
+        var channelsConfig = u.constant_array(channelsCount, null);
+        var channelOfInstrument = {};
 
-    function loadInstrument(instrumentName) {
-      return loadInstruments([instrumentName]);
-    }
+        function setChannelToInstrument(channelNumber, instrumentName) {
+          if (channelsConfig[channelNumber]) {
+            delete channelOfInstrument[channelsConfig[channelNumber]]; //removing instrument
+          }
+          channelsConfig[channelNumber] = instrumentName;
+          channelOfInstrument[instrumentName] = channelNumber;
+          MIDI.programChange(channelNumber, programNumberFor(instrumentName));
+        }
 
-    function loadAllInstruments() {
-      return loadInstruments(availableInstruments);
-    }
+        var availableChannelsNumbers = u.range(channelsCount);
+        var instrumentsSet = linkedSet([]);
 
-    var loadedMidi = loadAllInstruments();
+        var hasInstrument = instrumentsSet.contains;
 
-    return {
-      availableInstruments: availableInstruments,
-      loadedMidi: loadedMidi,
-      midi: MIDI,
-      programInstruments: programInstruments
-    };
+        function addInstrument(instrumentName) {
+          if(!hasInstrument(instrumentName)){
+            var channelNumber;
+            if(availableChannelsNumbers.length > 0){
+              channelNumber = availableChannelsNumbers.pop();
+            } else {
+              // no more available channels : pop out the oldest instrument and free channel.
+              var oldestInstrument = instrumentsSet.popFirst();
+              channelNumber = channelOfInstrument[oldestInstrument];
+            }
+            setChannelToInstrument(channelNumber,instrumentName);
+          }
+          // make it most recent instrument
+          instrumentsSet.addLast(instrumentName);
+        }
+        function removeInstrument(instrumentName) {
+          if(hasInstrument(instrumentName)){
+            var channelNumber = channelOfInstrument[instrumentName];
+            delete channelOfInstrument[instrumentName];
+            channelsConfig[channelNumber] = null;
 
-  }]);
+            availableChannelsNumbers.push(channelNumber);
+            instrumentsSet.remove(instrumentName);
+          }
+        }
+
+        function loadInstruments(instrumentNames) {
+          $log.debug("Loading instrument : ", instrumentNames, "...");
+
+          var deferredMidi = $q.defer();
+          MIDI.loadPlugin({
+            soundfontUrl: 'scripts/midi/soundfonts/',
+            instruments: instrumentNames,
+            callback: function () {
+              $log.debug("Done loading instrument : ", instrumentNames, "...");
+              $log.debug(MIDI);
+              deferredMidi.resolve(MIDI);
+            }
+          });
+
+          return deferredMidi.promise;
+        }
+
+        var loadedMidi = loadInstruments(availableInstruments);
+        loadedMidi.then(function () {
+          availableInstruments.forEach(addInstrument);
+          $log.debug("Channels config : ", channelsConfig);
+          $log.debug("Channels of instrument : ", channelOfInstrument);
+        });
+
+        function noteOn(instrumentName, pitch, delay, velocity) {
+          delay = (delay || 0);
+          velocity = (velocity || 127);
+
+          addInstrument(instrumentName);
+
+          var channelNumber = channelOfInstrument[instrumentName];
+          MIDI.noteOn(channelNumber,pitch,velocity,delay);
+        }
+        function noteOff(instrumentName, pitch, delay) {
+          MIDI.noteOff(channelOfInstrument[instrumentName],pitch,delay);
+        }
+
+        function playNote (instrumentName, pitch, duration, delay, velocity){
+          noteOn(instrumentName,pitch,delay,velocity);
+          noteOff(instrumentName,pitch,delay+duration);
+        }
+
+        var millisUntil = timeUtils.millisUntil;
+        function playNoteAt(instrumentName, pitch, duration, dateMillis, velocity){
+          var delay = millisUntil(dateMillis);
+          playNote(instrumentName,pitch,duration,delay,velocity);
+        }
+
+        return {
+          availableInstruments: availableInstruments,
+          loadedMidi: loadedMidi,
+          addInstrument: addInstrument,
+          removeInstrument: removeInstrument,
+          getCurrentInstruments: instrumentsSet.toArray,
+          noteOn: noteOn,
+          noteOff: noteOff,
+          playNote: playNote,
+          playNoteAt: playNoteAt
+        };
+
+      }]);
+
+}());

@@ -276,6 +276,100 @@
     return loyal_to(from_object)(from_object[method_name]);
   }
 
+  function make_FIFO (elements) {
+    elements = (elements || []).slice(); //defensive copying
+    var begin = 0, end = elements.length;
+
+    var res = {};
+    function toArray () {
+      return elements.slice(begin,end);
+    }
+    function size () {
+      return end-begin;
+    }
+    function isEmpty () {
+      return begin === end;
+    }
+    function push(element){
+      elements.push(element);
+      end += 1;
+      return res;
+    }
+    function pop(){
+      if(!isEmpty()){
+        var element = elements[begin];
+        delete elements[begin];
+        begin += 1;
+        return element;
+      }
+    }
+    res.toArray = toArray; // copies elements into a new array
+    res.size = size; // number of elements
+    res.isEmpty = isEmpty;
+    res.push = push; // adds an element at the end of the queue and returns the queue
+    res.pop = pop; //
+
+    return res;
+  }
+
+  /**
+   * Creates a bounded FIFO queue which drops the oldest elements when max_size is reached.
+   * @param max_size
+   * @param elements
+   * @returns {fifo}
+   */
+  function make_bounded_FIFO(max_size, elements){
+    var fifo = make_FIFO(), bounded_fifo = Object.create(fifo); // decorates a regular FIFO.
+
+    // decorating push.
+    function push(element) {
+      fifo.push(element);
+      while(fifo.size() > max_size) {
+        fifo.pop();
+      }
+      return bounded_fifo;
+    }
+    bounded_fifo.push = push;
+
+    // adding all elements
+    elements = elements || [];
+    elements.forEach(push);
+
+    return bounded_fifo;
+  }
+
+  /**
+   * Creates an array of the integers from the specified range.
+   * @param begin
+   * @param end
+   * @returns {Array}
+   */
+  function range (begin, end) {
+    var arr = [];
+    if(is_undefined(end)){
+      end = begin;
+      begin = 0;
+    }
+    for(var i = begin; i < end; i++) {
+      arr.push(i);
+    }
+    return arr;
+  }
+
+  /**
+   * Creates a constant function from the specified value.
+   * @param v
+   * @returns {Function}
+   */
+  function constant (v) {
+    return function () {
+      return v;
+    };
+  }
+
+  function constant_array (size,v) {
+    return range(size).map(constant(v));
+  }
 
   // EXPORT HERE :
 
@@ -283,13 +377,20 @@
     utils: {
       augmented_with : augmented_with,
       compose: compose,
+      constant: constant,
+      constant_array: constant_array,
       partial: partial,
       detached: detached,
       find: find,
       forProperty: forProperty,
       identity: identity,
       inspect: inspect,
+      is_defined: is_defined,
+      is_undefined: is_undefined,
       loyal_to: loyal_to,
+      make_FIFO: make_FIFO,
+      make_bounded_FIFO: make_bounded_FIFO,
+      range: range,
       some_defined: some_defined,
       to_real_array: to_real_array,
       varargs_ify : varargs_ify

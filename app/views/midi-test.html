@@ -1,11 +1,11 @@
 <h2>Settings</h2>
 <form>
     <div>
-        <label for="channel">channel</label>
-        <select name="" id="channel" ng-model="settings.channel">
-            <option value="{{+i}}"
-                    ng-repeat="i in helpers.channels">
-                {{i}}
+        <label for="instrument">channel</label>
+        <select name="instrument" id="instrument" ng-model="settings.instrument">
+            <option value="{{ins}}"
+                    ng-repeat="ins in instruments">
+                {{ins}}
             </option>
         </select>
     </div>
@@ -15,9 +15,9 @@
                 ng-model="settings.volume"/>
     </div>
     <div>
-        <label for="note">note</label>
-        <input type="text" id="note"
-               ng-model="settings.note"/>
+        <label for="pitch">pitch</label>
+        <input type="text" id="pitch"
+               ng-model="settings.pitch"/>
     </div>
     <div>
         <label for="velocity">velocity</label>

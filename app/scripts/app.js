@@ -29,7 +29,7 @@ angular
         templateUrl: 'views/midi-test.html',
         controller: 'MidiTestController',
         resolve: {
-          'loadedMidi': ['midi', function (midi) {
+          'loadedMidi': ['instruPlayer', function (midi) {
             return midi.loadedMidi;
           }]
         }
@@ -39,6 +39,6 @@ angular
         redirectTo: '/'
       });
   }])
-  .run(['midi', function (midi) {
+  .run(['instruPlayer', function (midi) {
     //midi.loadInstrument('acoustic_grand_piano');
   }]);
