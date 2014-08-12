@@ -12,16 +12,29 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
+
                 <!--<li class="active"><a href="#">Home</a></li>-->
+
                 <li><a ui-sref="about">About</a></li>
+
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown">Train<b class="caret"></b></a>
                     <ul class="dropdown-menu">
+
                         <li class="dropdown-header">Arithmetic</li>
                         <li><a ui-sref="train.add">Add</a></li>
                         <li><a ui-sref="train.substract">Substract</a></li>
+
                         <li class="divider"></li>
+
                         <li><a ui-sref="tables">Tables</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown">Sandbox<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a ui-sref="sandbox.miditest">MidiTest</a></li>
                     </ul>
                 </li>
             </ul>
