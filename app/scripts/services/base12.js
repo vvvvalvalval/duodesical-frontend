@@ -1,8 +1,8 @@
 angular.module('duodesicalApp')
   .factory('base12',[function () {
 
-    var digit10 = 'a';
-    var digit11 = 'b';
+    var digit10 = 'A';
+    var digit11 = 'B';
 
     var digits = ["0","1","2","3","4","5","6","7","8","9",digit10,digit11];
     var digitsValues = {};

@@ -2,7 +2,7 @@
 <p></p>
 
 <form id="train_substract" ng-if="isPlaying()" ng-submit="submitAnswer()">
-    <span>{{question.sum}}</span> - <span >{{question.x}}</span> =
+    <d12-note pitch="question.sum"></d12-note> - <d12-note pitch="question.x"></d12-note> =
     <input type="text" name="answer" ng-model="question.submittedAnswer"/>
     <input id="submit" type="submit" value="Submit"/>
 </form>
