@@ -45,9 +45,14 @@ angular
           url: '/substract',
           templateUrl: 'views/train-substract.html',
           controller: 'trainSubstractController'
+        })
+
+        .state('about',{
+          url:'/about',
+          templateUrl: 'views/about.html'
         });
 
-      $urlRouterProvider.otherwise('/sandbox/miditest');
+      $urlRouterProvider.otherwise('/about');
 
     }])
   .run(['instruPlayer', function (midi) {
