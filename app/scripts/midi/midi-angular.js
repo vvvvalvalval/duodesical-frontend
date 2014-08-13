@@ -187,8 +187,8 @@
       velocity: 127
     })
 
-    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils','defaultNoteOptions',
-      function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils, defaultNoteOptions) {
+    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils','defaultNoteOptions','$timeout',
+      function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils, defaultNoteOptions, $timeout) {
 
         var midijsInstrumentByName = MIDI.GeneralMIDI.byName;
         function programNumberFor(instrumentName) {
@@ -279,18 +279,37 @@
           MIDI.noteOff(channelOfInstrument[instrumentName],pitch,delay);
         }
 
-        function playNote (noteOptions){
+        function playNote (noteOptions,withReceipt,invokeApply){
+          var onDelay = (noteOptions.delay || defaultNoteOptions.delay),
+            offDelay=(noteOptions.delay || defaultNoteOptions.delay) + (noteOptions.duration || defaultNoteOptions.duration);
           noteOn(
             (noteOptions.instrument || defaultNoteOptions.instrument),
             (noteOptions.pitch || defaultNoteOptions.pitch),
-            (noteOptions.delay || defaultNoteOptions.delay),
+            onDelay,
             (noteOptions.velocity || defaultNoteOptions.velocity)
           );
           noteOff(
             (noteOptions.instrument || defaultNoteOptions.instrument),
             (noteOptions.pitch || defaultNoteOptions.pitch),
-            (noteOptions.delay || defaultNoteOptions.delay) + (noteOptions.duration || defaultNoteOptions.duration)
+            offDelay
           );
+          if(withReceipt){
+            var triggeredAt= timeUtils.nowMillis();
+            return {
+              triggeredAt: triggeredAt,
+              opts: noteOptions,
+              on: $timeout(function () {
+                return {
+                  elapsed: (timeUtils.nowMillis() - triggeredAt)
+                };
+              }, onDelay * 1000, !!invokeApply),
+              off: $timeout(function () {
+                return {
+                  elapsed: (timeUtils.nowMillis() - triggeredAt)
+                };
+              }, offDelay * 1000, !!invokeApply)
+            };
+          }
         }
 
         var millisUntil = timeUtils.millisUntil;
