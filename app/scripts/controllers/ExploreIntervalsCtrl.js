@@ -2,9 +2,10 @@ angular.module('duodesicalApp')
   .controller('ExploreIntervalsCtrl', ['instruPlayer', '$scope', '$log', 'd12random','base12',
     function (instruPlayer, $scope, $log, random, base12) {
 
-      var instruments = instruPlayer.getCurrentInstruments();
+      $scope.instruments = ['cello','acoustic_grand_piano','acoustic_guitar_steel', 'flute'];
+      $scope.base12 = base12;
 
-      var pickInstrument = random.uniformPicker(['cello','acoustic_grand_piano','acoustic_guitar_steel', 'flute']);
+      var pickInstrument = random.uniformPicker($scope.instruments);
 
       // nice pitch range.
       var pickPitch = random.intPicker(base12.readInt('30'),base12.readInt('60'));
@@ -46,24 +47,55 @@ angular.module('duodesicalApp')
         instruPlayer.playNote(io.instrument,io.basePitch, durationLow, delayLow, 127);
         instruPlayer.playNote(io.instrument,io.basePitch + io.interval, durationHigh, delayHigh, 127);
       }
+      $scope.playInterval = playInterval;
 
       $scope.intervalOpts = {
-        randomBasePitch: true,
-        basePitch: 48,
+        randomInstrument: true,
+        instrument: $scope.instruments[0],
 
-        randomTiming: true,
-        timing: 'simultaneous'
+        randomBasePitch: false,
+        basePitch: '40',
+
+        randomTiming: false,
+        timing: 'increasing'
       };
+
+      var o = $scope.intervalOpts;
+
+      function currentInstrument () {
+        return (o.randomInstrument ? pickInstrument() : o.instrument);
+      }
+      function currentBasePitch () {
+        return (o.randomBasePitch ? pickPitch() : base12.readInt(o.basePitch));
+      }
+      function currentTiming () {
+        return (o.randomTiming? pickTiming() : o.timing);
+      }
+
+      // intervals that were previously played
+      $scope.justPlayed = [];
 
       $scope.playThatInterval = function (interval) {
         var opts = {
-          basePitch: pickPitch(),
+          basePitch: currentBasePitch(),
           interval: interval,
-          instrument: pickInstrument(),
-          timing: pickTiming()
+          instrument: currentInstrument(),
+          timing: currentTiming()
         };
         $log.debug('Play some interval : ', opts);
         playInterval(opts);
-      }
+        $scope.justPlayed.push(opts);
+      };
+
+      $scope.playThePitch = function (pitch12) {
+        instruPlayer.playNote(currentInstrument(), base12.readInt(pitch12), duration, 0, 127);
+      };
+
+      $scope.playBasePitch = function (opts) {
+        instruPlayer.playNote(opts.instrument,opts.basePitch, duration, 0, 127);
+      };
+      $scope.playOtherPitch = function (opts) {
+        instruPlayer.playNote(opts.instrument,opts.basePitch + opts.interval, duration, 0, 127);
+      };
 
     }]);

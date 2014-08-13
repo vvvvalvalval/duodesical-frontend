@@ -42,18 +42,83 @@
 </div>
 <div style="display: inline-block;"
      tooltip-placement="bottom" tooltip="aka Minor 7th">
-    <d12-invl v="10" ng-click="playThatInterval(1)"></d12-invl>
+    <d12-invl v="10" ng-click="playThatInterval(10)"></d12-invl>
 </div>
 <div style="display: inline-block;"
      tooltip-placement="bottom" tooltip="aka Major 7th">
-    <d12-invl v="11" ng-click="playThatInterval(1)"></d12-invl>
+    <d12-invl v="11" ng-click="playThatInterval(11)"></d12-invl>
 </div>
 <div style="display: inline-block;"
      tooltip-placement="bottom" tooltip="aka Octave">
-    <d12-invl v="12" ng-click="playThatInterval(1)"></d12-invl>
+    <d12-invl v="12" ng-click="playThatInterval(12)"></d12-invl>
 </div>
 
-<div class="player-opts">
-    
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Settings</h2>
+                <form class="player-opts">
 
-</div>
+                    <div class="form-group">
+                        <label for="instrument-choice">Instrument : </label>
+                        <input type="checkbox" ng-model="intervalOpts.randomInstrument"/> random
+                        <select class="form-control" name="instrument" id="instrument-choice" ng-model="intervalOpts.instrument"
+                                ng-disabled="intervalOpts.randomInstrument">
+                            <option value="{{ins}}"
+                                    ng-repeat="ins in instruments">
+                                {{ins}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Play interval :</label>
+                        <input type="checkbox" ng-model="intervalOpts.randomTiming"/> random
+                        <div class=""
+                             ng-hide="intervalOpts.randomTiming">
+                            <input class="radio-inline" type="radio" ng-model="intervalOpts.timing" value="increasing"> Ascending </label>
+                            <input class="radio-inline" type="radio" ng-model="intervalOpts.timing" value="simultaneous"> Simultaneous </label>
+                            <input class="radio-inline" type="radio" ng-model="intervalOpts.timing" value="decreasing"> Descending </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Base Pitch</label>
+                        <input type="checkbox" ng-model="intervalOpts.randomBasePitch"/> random
+                        <div class="row" ng-if="!intervalOpts.randomBasePitch">
+                            <div class="col-xs-10">
+                                <input class="form-control" type="text" ng-model="intervalOpts.basePitch"/>
+                            </div>
+                            <div class="col-xs-2">
+                                <d12-note pitch="base12.readInt(intervalOpts.basePitch)"
+                                          ng-if="base12.readInt(intervalOpts.basePitch)"
+                                          ng-click="playThePitch(intervalOpts.basePitch)"></d12-note>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-6" ng-show="justPlayed.length > 0">
+                <h2>Just played</h2>
+                <div class="just-played">
+                    <div class="just-played_card" ng-repeat="opts in justPlayed | reverse">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <d12-invl v="opts.interval" ng-click="playInterval(opts)"></d12-invl>
+                                ({{opts.instrument}})
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <d12-note pitch="opts.basePitch"
+                                          ng-click="playBasePitch(opts)"></d12-note>
+                                -
+                                <d12-note pitch="opts.basePitch + opts.interval"
+                                          ng-click="playOtherPitch(opts)"></d12-note>
+                                {{opts.timing}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
