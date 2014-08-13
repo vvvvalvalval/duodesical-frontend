@@ -176,6 +176,9 @@
       }
     }])
 
+    .value('minPitch',21)
+    .value('maxPitch',108)
+
     .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils',
       function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils) {
 

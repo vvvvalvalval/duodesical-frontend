@@ -5,10 +5,18 @@ angular
     'ngRoute',
     'duodesicalMIDI',
     'd12calToolbox',
-    'ui.router'
+    'ui.router',
+    'ui.bootstrap'
   ])
-  .config(['$stateProvider', '$urlRouterProvider',
-    function ($stateProvider, $urlRouterProvider) {
+
+  .constant('d12appResolvers',{
+    loadedMidi: ['instruPlayer', function (midi) {
+      return midi.loadedMidi;
+    }]
+  })
+
+  .config(['$stateProvider', '$urlRouterProvider','d12appResolvers',
+    function ($stateProvider, $urlRouterProvider, d12appResolvers) {
       $stateProvider
 
         .state('sandbox',{
@@ -20,9 +28,7 @@ angular
           templateUrl: 'views/midi-test.html',
           controller: 'MidiTestController',
           resolve: {
-            'loadedMidi': ['instruPlayer', function (midi) {
-              return midi.loadedMidi;
-            }]
+            loadedMidi: d12appResolvers.loadedMidi
           }
         })
         .state('sandbox.notes',{
@@ -49,6 +55,19 @@ angular
           url: '/substract',
           templateUrl: 'views/train-substract.html',
           controller: 'trainSubstractController'
+        })
+
+        .state('explore',{
+          url: '/explore',
+          templateUrl: 'views/explore.html'
+        })
+        .state('explore.intervals',{
+          url: '/intervals',
+          templateUrl: 'views/explore-intervals.html',
+          controller: 'ExploreIntervalsCtrl',
+          resolve: {
+            loadedMidi: d12appResolvers.loadedMidi
+          }
         })
 
         .state('about',{
