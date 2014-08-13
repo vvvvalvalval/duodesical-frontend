@@ -6,7 +6,8 @@ angular
     'duodesicalMIDI',
     'd12calToolbox',
     'ui.router',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'ngAnimate'
   ])
 
   .constant('d12appResolvers',{

@@ -158,5 +158,37 @@ body {
     background-color: #ffffff;
     border-radius: 5px;
     margin: 4px;
+
+    &.ng-enter, &.ng-leave, &.ng-move {
+      -webkit-transition: 0.2s linear all;
+      -moz-transition: 0.2s linear all;
+      -o-transition: 0.2s linear all;
+      transition: 0.2s linear all;
+    }
+
+    &.ng-enter,
+    &.ng-move {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    &.ng-move.ng-move-active,
+    &.ng-enter.ng-enter-active {
+      opacity: 1;
+      height: 120px;
+    }
+
+    &.ng-leave {
+      opacity: 1;
+      overflow: hidden;
+    }
+
+    &.ng-leave.ng-leave-active {
+      opacity: 0;
+      height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   }
 }
