@@ -179,8 +179,16 @@
     .value('minPitch',21)
     .value('maxPitch',108)
 
-    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils',
-      function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils) {
+    .value('defaultNoteOptions',{
+      instrument: 'acoustic_guitar_steel',
+      pitch: 48,
+      delay: 0,
+      duration: 1.0,
+      velocity: 127
+    })
+
+    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils','defaultNoteOptions',
+      function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils, defaultNoteOptions) {
 
         var midijsInstrumentByName = MIDI.GeneralMIDI.byName;
         function programNumberFor(instrumentName) {
@@ -271,9 +279,18 @@
           MIDI.noteOff(channelOfInstrument[instrumentName],pitch,delay);
         }
 
-        function playNote (instrumentName, pitch, duration, delay, velocity){
-          noteOn(instrumentName,pitch,delay,velocity);
-          noteOff(instrumentName,pitch,delay+duration);
+        function playNote (noteOptions){
+          noteOn(
+            (noteOptions.instrument || defaultNoteOptions.instrument),
+            (noteOptions.pitch || defaultNoteOptions.pitch),
+            (noteOptions.delay || defaultNoteOptions.delay),
+            (noteOptions.velocity || defaultNoteOptions.velocity)
+          );
+          noteOff(
+            (noteOptions.instrument || defaultNoteOptions.instrument),
+            (noteOptions.pitch || defaultNoteOptions.pitch),
+            (noteOptions.delay || defaultNoteOptions.delay) + (noteOptions.duration || defaultNoteOptions.duration)
+          );
         }
 
         var millisUntil = timeUtils.millisUntil;

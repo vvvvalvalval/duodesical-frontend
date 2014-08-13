@@ -44,8 +44,18 @@ angular.module('duodesicalApp')
           durationLow = duration - timeSpacing; durationHigh = duration;
         }
 
-        instruPlayer.playNote(io.instrument,io.basePitch, durationLow, delayLow, 127);
-        instruPlayer.playNote(io.instrument,io.basePitch + io.interval, durationHigh, delayHigh, 127);
+        instruPlayer.playNote({
+          instrument: io.instrument,
+          pitch: io.basePitch,
+          duration: durationLow,
+          delay: delayLow
+        });
+        instruPlayer.playNote({
+            instrument: io.instrument,
+            pitch: io.basePitch + io.interval,
+            duration: durationHigh,
+            delay: delayHigh
+        });
       }
       $scope.playInterval = playInterval;
 
@@ -88,14 +98,26 @@ angular.module('duodesicalApp')
       };
 
       $scope.playThePitch = function (pitch12) {
-        instruPlayer.playNote(currentInstrument(), base12.readInt(pitch12), duration, 0, 127);
+        instruPlayer.playNote({
+          instrument: currentInstrument(),
+          pitch: base12.readInt(pitch12),
+          duration:duration
+        });
       };
 
       $scope.playBasePitch = function (opts) {
-        instruPlayer.playNote(opts.instrument,opts.basePitch, duration, 0, 127);
+        instruPlayer.playNote({
+          instrument: opts.instrument,
+          pitch: opts.basePitch,
+          duration:duration
+        });
       };
       $scope.playOtherPitch = function (opts) {
-        instruPlayer.playNote(opts.instrument,opts.basePitch + opts.interval, duration, 0, 127);
+        instruPlayer.playNote({
+          instrument: opts.instrument,
+          pitch: opts.basePitch + opts.interval,
+          duration:duration
+        });
       };
 
     }]);

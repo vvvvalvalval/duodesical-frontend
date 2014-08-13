@@ -17,6 +17,12 @@ angular.module('duodesicalApp')
       var s = $scope.settings;
       $log.debug("Playing the note : ",s);
 
-      instruPlayer.playNote(s.instrument, +s.pitch, +s.duration, +s.delay, +s.velocity);
+      instruPlayer.playNote({
+        instrument: s.instrument,
+        pitch: +s.pitch,
+        duration: +s.duration,
+        delay: +s.delay,
+        velocity: +s.velocity
+      });
     }
   }]);
