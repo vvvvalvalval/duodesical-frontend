@@ -154,3 +154,10 @@ body {
   padding-top: 0;
   padding-bottom: 0;
 }
+.cyclic-keyboard {
+  position: relative;
+  background-color: lightgray;
+}
+.cyclic-keyboard .ck_note-container {
+  position: absolute;
+}

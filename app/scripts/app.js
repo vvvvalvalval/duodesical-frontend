@@ -36,6 +36,14 @@ angular
           url: '/notes',
           templateUrl: 'views/notes-sandbox.html'
         })
+        .state('sandbox.cyclicKeyboard',{
+          url:'/cyclic-keyboard',
+          templateUrl: 'views/cyclic-keyboard.html',
+          resolve: {
+            loadedMidi: d12appResolvers.loadedMidi
+          },
+          controller: 'CyclicKeyboardCtrl'
+        })
 
         .state('tables',{
           url: '/tables',

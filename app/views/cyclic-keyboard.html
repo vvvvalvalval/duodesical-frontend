@@ -1,0 +1,30 @@
+<div class="cyclic-keyboard" ng-style="{'width':(ckDisplaySettings.width + 'px'), 'height': (ckDisplaySettings.width + 'px')}">
+
+    <div class="ck_note-container"
+         ng-repeat="pitch in pitches"
+         ng-style="{'left': (getPosition(pitch).x + 'px'), 'bottom': (getPosition(pitch).y + 'px')}">
+        <d12-note pitch="pitch"
+                ng-if="display(pitch)"
+                ng-click="playNote(pitch)"></d12-note>
+    </div>
+</div>
+<h3>Settings</h3>
+<form>
+    <label>width :</label>
+    <input type="text" ng-model="ckDisplaySettings.width"/>
+
+    <label>octaveHeight : </label>
+    <input type="text" ng-model="ckDisplaySettings.octaveHeight"/>
+
+    <label>a : </label>
+    <input type="text" ng-model="ckDisplaySettings.a"/>
+
+    <label>rMin : </label>
+    <input type="text" ng-model="ckDisplaySettings.rMin"/>
+
+    <label>minPitch : </label>
+    <input type="text" ng-model="ckDisplaySettings.minPitch"/>
+
+    <label>numberDisplayed : </label>
+    <input type="text" ng-model="ckDisplaySettings.numberDisplayed"/>
+</form>
