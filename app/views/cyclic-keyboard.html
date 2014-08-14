@@ -2,7 +2,8 @@
 
     <div class="ck_note-container"
          ng-repeat="pitch in pitches"
-         ng-style="{'left': (getPosition(pitch).x + 'px'), 'bottom': (getPosition(pitch).y + 'px')}">
+         ng-style="{'left': (getPosition(pitch).x + '%'), 'bottom': (getPosition(pitch).y + '%')}"
+         ng-class="{'playing': isPlaying(pitch)}">
         <d12-note pitch="pitch"
                 ng-if="display(pitch)"
                 ng-click="playNote(pitch)"></d12-note>

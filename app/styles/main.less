@@ -196,8 +196,22 @@ body {
 .cyclic-keyboard {
   position: relative;
   background-color: lightgray;
+  border-radius: 10000px;
+  overflow: hidden;
 
   .ck_note-container {
     position: absolute;
+    .d12-note {
+      position: absolute;
+      top: -21px;
+      left: -21px;
+    }
+
+    &.playing .d12-note {
+      @playing-color: #1e90ff;
+      background-color: @playing-color;
+      border-color: @playing-color;
+    }
   }
+
 }
