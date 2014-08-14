@@ -1,38 +1,50 @@
 angular.module('duodesicalApp')
-  .controller('CyclicKeyboardCtrl', ['instruPlayer', '$scope', '$log', 'd12allPitches',
-    function (instruPlayer, $scope, $log, d12allPitches) {
+  .controller('CyclicKeyboardCtrl', ['instruPlayer', '$scope', '$log', 'd12allPitches','base12',
+    function (instruPlayer, $scope, $log, d12allPitches, base12) {
 
       $scope.pitches = d12allPitches;
 
       // display
       $scope.ckDisplaySettings = {
         width: 450,
-        a: 0.00005,
-        octaveHeight: 0.08,
-        rMin: 0.18,
-        minPitch: 36
+        distorsion: 0.00005,
+        octaveHeight: 38,
+        rMin: 70,
+        minPitch: "30"
       };
+
       var ck = $scope.ckDisplaySettings;
+      function minPitch(){
+        return base12.readInt(ck.minPitch);
+      }
+      $scope.incMinPitch = function () {
+        ck.minPitch = base12.inB12(minPitch()+1);
+      };
+      $scope.decMinPitch = function () {
+        ck.minPitch = base12.inB12(minPitch()-1);
+      };
 
       function cartesianCoordinates(r, theta) {
-        var centerX = 0.5, centerY = 0.5;
+        //var centerX = 0.5, centerY = 0.5;
         return {
-          x: (centerX + r * Math.cos(theta)) * 100,
-          y: (centerY + r * Math.sin(theta)) * 100
+          x: (r * Math.cos(theta)),
+          y: (r * Math.sin(theta))
         };
       }
 
       var twelveth = 2 * Math.PI / 12;
 
       function display(pitch) {
-        return (pitch >= +ck.minPitch);
+        return (pitch >= minPitch());
       }
 
       $scope.display = display;
       function getPosition(pitch) {
-        pitch = (pitch - ck.minPitch);
-        var r = +ck.rMin + (pitch * ck.octaveHeight / 12);
-        var theta = (1 - (ck.a * pitch)) * twelveth * pitch;
+        var relPitch = (pitch - minPitch());
+
+        var r = +ck.rMin + (relPitch * ck.octaveHeight / 12);
+
+        var theta = (1 - (ck.distorsion * relPitch)) * twelveth * pitch;
 
         return cartesianCoordinates(r, theta);
       }

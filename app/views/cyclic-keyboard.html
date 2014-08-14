@@ -1,31 +1,44 @@
 <div class="cyclic-keyboard" ng-style="{'width':(ckDisplaySettings.width + 'px'), 'height': (ckDisplaySettings.width + 'px')}">
 
-    <div class="ck_note-container"
-         ng-repeat="pitch in pitches"
-         ng-style="{'left': (getPosition(pitch).x + '%'), 'bottom': (getPosition(pitch).y + '%')}"
-         ng-class="{'playing': isPlaying(pitch)}">
-        <d12-note pitch="pitch"
-                ng-if="display(pitch)"
-                ng-click="playNote(pitch)"></d12-note>
+    <div class="ck_center">
+        <div class="ck_note-container"
+             ng-repeat="pitch in pitches"
+             ng-style="{'left': (getPosition(pitch).x + 'px'), 'bottom': (getPosition(pitch).y + 'px')}"
+             ng-class="{'playing': isPlaying(pitch)}">
+            <d12-note pitch="pitch"
+                      ng-if="display(pitch)"
+                      ng-click="playNote(pitch)"></d12-note>
+        </div>
     </div>
+
 </div>
 <h3>Settings</h3>
-<form>
-    <label>width :</label>
-    <input type="text" ng-model="ckDisplaySettings.width"/>
+<form class="form-horizontal">
 
-    <label>octaveHeight : </label>
-    <input type="text" ng-model="ckDisplaySettings.octaveHeight"/>
+    <div class="form-group">
+        <label>minPitch : </label>
+        <input type="text" ng-model="ckDisplaySettings.minPitch"/>
+        <button class="btn btn-primary" ng-click="incMinPitch()"> + </button>
+        <button class="btn btn-primary" ng-click="decMinPitch()"> - </button>
+    </div>
 
-    <label>a : </label>
-    <input type="text" ng-model="ckDisplaySettings.a"/>
+    <div class="form-group">
+        <label>width :</label>
+        <input type="text" ng-model="ckDisplaySettings.width"/>
+    </div>
 
-    <label>rMin : </label>
-    <input type="text" ng-model="ckDisplaySettings.rMin"/>
+    <div class="form-group">
+        <label>octaveHeight : </label>
+        <input type="text" ng-model="ckDisplaySettings.octaveHeight"/>
+    </div>
 
-    <label>minPitch : </label>
-    <input type="text" ng-model="ckDisplaySettings.minPitch"/>
+    <div class="form-group">
+        <label>distorsion : </label>
+        <input type="text" ng-model="ckDisplaySettings.distorsion"/>
+    </div>
 
-    <label>numberDisplayed : </label>
-    <input type="text" ng-model="ckDisplaySettings.numberDisplayed"/>
+    <div class="form-group">
+        <label>rMin : </label>
+        <input type="text" ng-model="ckDisplaySettings.rMin"/>
+    </div>
 </form>

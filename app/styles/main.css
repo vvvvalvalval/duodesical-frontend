@@ -160,6 +160,12 @@ body {
   border-radius: 10000px;
   overflow: hidden;
 }
+.cyclic-keyboard .ck_center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  overflow: visible;
+}
 .cyclic-keyboard .ck_note-container {
   position: absolute;
 }
