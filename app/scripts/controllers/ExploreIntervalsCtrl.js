@@ -12,7 +12,7 @@ angular.module('duodesicalApp')
 
       var pickInterval = random.intPicker(0,13);
 
-      var timings = ['increasing','simultaneous','decreasing'];
+      var timings = ['ascending','simultaneous','descending'];
       var pickTiming = random.uniformPicker(timings);
 
       function pickIntervalOpts () {
@@ -33,13 +33,13 @@ angular.module('duodesicalApp')
         var delayLow, delayHigh,
           durationLow, durationHigh;
         var timing = io.timing;
-        if(timing === 'increasing'){
+        if(timing === 'ascending'){
           delayLow = 0; delayHigh = timeSpacing;
           durationLow = duration; durationHigh = duration - timeSpacing;
         } else if(timing === 'simultaneous') {
           delayLow = 0; delayHigh = 0;
           durationLow = duration; durationHigh = duration;
-        } else if(timing === 'decreasing'){
+        } else if(timing === 'descending'){
           delayLow = timeSpacing; delayHigh = 0;
           durationLow = duration - timeSpacing; durationHigh = duration;
         }
@@ -67,7 +67,7 @@ angular.module('duodesicalApp')
         basePitch: '40',
 
         randomTiming: false,
-        timing: 'increasing'
+        timing: 'ascending'
       };
 
       var o = $scope.intervalOpts;
