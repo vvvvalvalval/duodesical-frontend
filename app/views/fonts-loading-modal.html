@@ -1,0 +1,16 @@
+<h2>Filling your browser with music ...</h2>
+<p ng-if="fontsLoadingState === 'loading'">
+    Please wait while we are loading the sound fonts...
+</p>
+<p ng-if="fontsLoadingState === 'loaded'">
+    Sound fonts successfully loaded :D !
+</p>
+<p ng-if="fontsLoadingState === 'failed'">
+    Failed to load your sound fonts ...
+</p>
+
+<button class="btn btn-primary"
+        ng-click="$close(fontsLoadingState)"
+        ng-disabled="fontsLoadingState === 'loading'">
+    Exit
+</button>

@@ -156,7 +156,7 @@ body {
 }
 .cyclic-keyboard {
   position: relative;
-  background-color: lightgray;
+  background-color: beige;
   border-radius: 10000px;
   overflow: hidden;
 }
