@@ -247,7 +247,7 @@
 
           var deferredMidi = $q.defer();
           MIDI.loadPlugin({
-            soundfontUrl: 'scripts/midi/soundfonts/',
+            soundfontUrl: 'soundfonts/',
             instruments: instrumentNames,
             callback: function () {
               $log.debug("Done loading instrument : ", instrumentNames, "...");
