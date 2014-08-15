@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('trainAddController',['base12','$scope','$log', function (base12, $scope, $log) {
 
     function randomNumber(max){

@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .factory('base12',[function () {
 
     var digit10 = 'A';

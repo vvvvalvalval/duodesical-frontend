@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('CyclicKeyboardCtrl', ['instruPlayer', '$scope', '$log', 'd12allPitches','base12',
     function (instruPlayer, $scope, $log, d12allPitches, base12) {
 

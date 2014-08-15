@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('tablesController',['base12','$scope','$log', function (base12, $scope, $log) {
 
     var untilX = 12, untilY = 12;

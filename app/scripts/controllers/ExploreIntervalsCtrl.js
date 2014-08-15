@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('ExploreIntervalsCtrl', ['instruPlayer', '$scope', '$log', 'd12random','base12',
     function (instruPlayer, $scope, $log, random, base12) {
 

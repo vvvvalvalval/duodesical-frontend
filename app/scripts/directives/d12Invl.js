@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .directive('d12Invl', function () {
     return {
       restrict: 'E',

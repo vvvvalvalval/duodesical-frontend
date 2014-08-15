@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('MainCtrl', ['$scope',function ($scope) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',

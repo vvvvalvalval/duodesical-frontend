@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('ModalCtrl', ['$scope', 'instruPlayer', '$log', '$timeout', function ($scope, instruPlayer, $log, $timeout) {
 
     $scope.fontsLoadingState = 'loading';

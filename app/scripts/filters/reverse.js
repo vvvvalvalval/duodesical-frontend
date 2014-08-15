@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .filter('reverse', function () {
     return function (items) {
       return items.slice().reverse();

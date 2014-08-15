@@ -1,4 +1,4 @@
-angular.module('duodesicalApp')
+angular.module('d12App')
   .controller('MidiTestController',['instruPlayer', '$scope', '$log', function (instruPlayer, $scope, $log) {
 
     var instruments = instruPlayer.getCurrentInstruments();
