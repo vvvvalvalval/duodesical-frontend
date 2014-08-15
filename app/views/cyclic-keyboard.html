@@ -1,44 +1,100 @@
-<div class="cyclic-keyboard" ng-style="{'width':(ckDisplaySettings.width + 'px'), 'height': (ckDisplaySettings.width + 'px')}">
 
-    <div class="ck_center">
-        <div class="ck_note-container"
-             ng-repeat="pitch in pitches"
-             ng-style="{'left': (getPosition(pitch).x + 'px'), 'bottom': (getPosition(pitch).y + 'px')}"
-             ng-class="{'playing': isPlaying(pitch)}">
-            <d12-note pitch="pitch"
-                      ng-if="display(pitch)"
-                      ng-click="playNote(pitch)"></d12-note>
+<div id="cyclic-keyboard-page" class="row">
+
+    <div class="col-md-6 col-sm-12">
+        <div class="cyclic-keyboard">
+
+            <div class="ck_center">
+                <div class="ck_note-container"
+                     ng-repeat="pitch in pitches"
+                     ng-style="{'left': (getPosition(pitch).x + 'px'), 'bottom': (getPosition(pitch).y + 'px')}"
+                     ng-class="{'playing': isPlaying(pitch)}">
+                    <d12-note pitch="pitch"
+                              ng-if="display(pitch)"
+                              ng-click="clickNote(pitch)"></d12-note>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <div class="col-md-6 col-sm-12">
+        <h2>Cyclic Keyboard</h2>
+        <p>
+            A useful representation of all the notes. Click away!
+        </p>
+
+        <hr/>
+
+        <h3>Settings</h3>
+        <form class="form-horizontal">
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label"
+                        popover="Set the minimum pitch that will be displayed in the keyboard. Ranges from 19 to 90." popover-trigger="mouseenter">
+                    Minimum pitch
+                </label>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" ng-model="ckDisplaySettings.minPitch"/>
+                        </div>
+                        <div class="col-xs-4">
+                            <button class="btn btn-primary" ng-click="incMinPitch()"> <i class="fa fa-plus"></i> </button>
+                            <button class="btn btn-primary" ng-click="decMinPitch()"> <i class="fa fa-minus"></i> </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label"
+                       popover="Here you can set the instrument for the next notes to be played." popover-trigger="mouseenter">
+                    Instrument
+                </label>
+                <div class="col-sm-6">
+                    <select class="form-control" ng-model="playerSettings.currentInstrument">
+                        <option ng-repeat="ins in instruments" value="{{ins.midiName}}">
+                            {{ins.humanName}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label"
+                       popover="How keys are released." popover-trigger="mouseenter">
+                    Sustain Mode
+                </label>
+                <div class="col-sm-6 checkbox">
+                    <label popover="Notes ring until you click them again." popover-trigger="mouseenter">
+                        <input type="radio" class="" ng-model="playerSettings.sustainMode" ng-value="true"/>
+                        On
+                    </label>
+                    <label popover="Notes ring for a certain duration, defined below." popover-trigger="mouseenter">
+                        <input type="radio" class="" ng-model="playerSettings.sustainMode" ng-value="false"/>
+                        Off
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" ng-if="!playerSettings.sustainMode">
+                <label class="col-sm-3 control-label"
+                       popover="Set the duration of the notes, in milliseconds." popover-trigger="mouseenter">
+                    Note duration
+                </label>
+                <div class="col-xs-4">
+                    <input type="number" class="form-control" ng-model="playerSettings.duration"/>
+                </div>
+                <div class="col-xs-4 checkbox"> <span class="">ms</span></div>
+            </div>
+            <div class="form-group" ng-if="!playerSettings.sustainMode">
+                <label class="col-sm-3 control-label"
+                       popover="How hard the notes are played." popover-trigger="mouseenter">
+                    Note velocity
+                </label>
+                <div class="col-xs-4">
+                    <input type="number" class="form-control" ng-model="playerSettings.velocity"/>
+                </div>
+            </div>
+        </form>
+    </div>
+
 </div>
-<h3>Settings</h3>
-<form class="form-horizontal">
-
-    <div class="form-group">
-        <label>minPitch : </label>
-        <input type="text" ng-model="ckDisplaySettings.minPitch"/>
-        <button class="btn btn-primary" ng-click="incMinPitch()"> + </button>
-        <button class="btn btn-primary" ng-click="decMinPitch()"> - </button>
-    </div>
-
-    <div class="form-group">
-        <label>width :</label>
-        <input type="text" ng-model="ckDisplaySettings.width"/>
-    </div>
-
-    <div class="form-group">
-        <label>octaveHeight : </label>
-        <input type="text" ng-model="ckDisplaySettings.octaveHeight"/>
-    </div>
-
-    <div class="form-group">
-        <label>distorsion : </label>
-        <input type="text" ng-model="ckDisplaySettings.distorsion"/>
-    </div>
-
-    <div class="form-group">
-        <label>rMin : </label>
-        <input type="text" ng-model="ckDisplaySettings.rMin"/>
-    </div>
-</form>

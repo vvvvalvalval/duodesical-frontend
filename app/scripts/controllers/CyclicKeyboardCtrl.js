@@ -1,6 +1,6 @@
 angular.module('d12App')
-  .controller('CyclicKeyboardCtrl', ['instruPlayer', '$scope', '$log', 'd12allPitches','base12',
-    function (instruPlayer, $scope, $log, d12allPitches, base12) {
+  .controller('CyclicKeyboardCtrl', ['instruPlayer', '$scope', '$log', 'd12allPitches','base12','availableInstrumentsData',
+    function (instruPlayer, $scope, $log, d12allPitches, base12, availableInstrumentsData) {
 
       $scope.pitches = d12allPitches;
 
@@ -52,29 +52,65 @@ angular.module('d12App')
       $scope.getPosition = getPosition;
 
 
+      $log.debug("availableInstrumentsData = ", availableInstrumentsData);
+      $scope.instruments = availableInstrumentsData;
+
+      $scope.playerSettings = {
+        currentInstrument : availableInstrumentsData[0].midiName,
+        sustainMode: false,
+        duration: 600,
+        velocity: 127
+      };
+      var pS = $scope.playerSettings;
+
       var pitchesPlaying = [];
+      var notesOnOff = [];
 
       function isPlaying(pitch) {
         return !!pitchesPlaying[pitch];
       }
       $scope.isPlaying = isPlaying;
 
-      $scope.playNote = function (pitch) {
-        var p = instruPlayer.playNote({
-          pitch: pitch,
-          duration: 0.6
-        }, true);
-        p.on.then(function (data) {
-          if(!pitchesPlaying[pitch]){
-            pitchesPlaying[pitch] = 0;
+      $scope.clickNote = function (pitch) {
+        if (pS.sustainMode){
+          if(!notesOnOff[pitch]){
+            var opts = {
+              instrument: pS.currentInstrument,
+              pitch: pitch,
+              velocity: pS.velocity
+            };
+            notesOnOff[pitch] = opts;
+            instruPlayer.noteOn2(opts);
+            if(!pitchesPlaying[pitch]){
+              pitchesPlaying[pitch] = 0;
+            }
+            pitchesPlaying[pitch] += 1;
+          } else {
+            var opts = notesOnOff[pitch];
+            instruPlayer.noteOff2(opts);
+            delete notesOnOff[pitch];
+            pitchesPlaying[pitch] -= 1;
           }
-          pitchesPlaying[pitch] += 1;
-        });
-        p.off.then(function (data) {
-          pitchesPlaying[pitch] -= 1;
-        });
+        } else {
+          var p = instruPlayer.playNote({
+            instrument: pS.currentInstrument,
+            pitch: pitch,
+            duration: pS.duration / 1000,
+            velocity: pS.velocity
+          }, true);
+          p.on.then(function (data) {
+            if(!pitchesPlaying[pitch]){
+              pitchesPlaying[pitch] = 0;
+            }
+            pitchesPlaying[pitch] += 1;
+          });
+          p.off.then(function (data) {
+            pitchesPlaying[pitch] -= 1;
+          });
+        }
         //p.on.then(function (data) {
         //  $log.debug("triggered at : ",p.triggeredAt,", elapsed : ", data.elapsed);
         //});
-      }
+      };
+
     }]);

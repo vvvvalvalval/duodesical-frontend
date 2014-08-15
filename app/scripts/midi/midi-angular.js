@@ -144,30 +144,33 @@
     // number of available MIDI channels.
     .constant('channelsCount', 16)
 
-    // default loaded instruments.
-    .constant('availableInstruments', [
-      "acoustic_grand_piano",
-      'acoustic_guitar_steel',
-      'cello',
-      'church_organ',
-      'distortion_guitar',
-      'flute',
-      'soprano_sax'
-      //,'acoustic_guitar_nylon',
-      //'banjo',
-      //'clarinet',
-      //'contrabass',
-      //'electric_bass_finger',
-      //'electric_guitar_clean',
-      //'overdriven_guitar',
-      //'string_ensemble_1',
-      //'synth_drum',
-      //'trumpet',
-      //'violin'
-    ])
+    // provider to set what instruments will be loaded.
+    .provider('availableInstruments', function AvailableInstrumentsProvider() {
+      var loadedInstruments = ['acoustic_grand_piano','acoustic_guitar_steel']; //defaults to 2 instruments
 
-    .factory('MIDI', ['$window','$log', function ($window,$log) {
-      if(angular.isDefined($window.MIDI)){
+      this.setLoadedInstruments = function (instruments) {
+        loadedInstruments = instruments;
+      };
+
+      this.$get = ['$log',function ($log) {
+        var list = angular.copy(loadedInstruments);
+        var map = list.reduce(function (map, midiName) {
+          map[midiName] = true;
+          return map;
+        }, {});
+
+        return {
+          list: list,
+          isAvailable: function (midiName) {
+            return !!map[midiName];
+          }
+        };
+
+      }];
+    })
+
+    .factory('MIDI', ['$window', '$log', function ($window, $log) {
+      if (angular.isDefined($window.MIDI)) {
         var MIDI = $window.MIDI;
         $log.debug("Found MIDI.js global object : ", MIDI);
         return MIDI;
@@ -176,10 +179,10 @@
       }
     }])
 
-    .value('minPitch',21)
-    .value('maxPitch',108)
+    .value('minPitch', 21)
+    .value('maxPitch', 108)
 
-    .value('defaultNoteOptions',{
+    .value('defaultNoteOptions', {
       instrument: 'acoustic_guitar_steel',
       pitch: 48,
       delay: 0,
@@ -187,10 +190,11 @@
       velocity: 127
     })
 
-    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments','MIDI','timeUtils','defaultNoteOptions','$timeout',
+    .factory('instruPlayer', ['$q', '$log', 'd12Utils', 'channelsCount', 'availableInstruments', 'MIDI', 'timeUtils', 'defaultNoteOptions', '$timeout',
       function ($q, $log, u, channelsCount, availableInstruments, MIDI, timeUtils, defaultNoteOptions, $timeout) {
 
         var midijsInstrumentByName = MIDI.GeneralMIDI.byName;
+
         function programNumberFor(instrumentName) {
           return midijsInstrumentByName[instrumentName].number;
         }
@@ -217,22 +221,23 @@
         var hasInstrument = instrumentsSet.contains;
 
         function addInstrument(instrumentName) {
-          if(!hasInstrument(instrumentName)){
+          if (!hasInstrument(instrumentName)) {
             var channelNumber;
-            if(availableChannelsNumbers.length > 0){
+            if (availableChannelsNumbers.length > 0) {
               channelNumber = availableChannelsNumbers.pop();
             } else {
               // no more available channels : pop out the oldest instrument and free channel.
               var oldestInstrument = instrumentsSet.popFirst();
               channelNumber = channelOfInstrument[oldestInstrument];
             }
-            setChannelToInstrument(channelNumber,instrumentName);
+            setChannelToInstrument(channelNumber, instrumentName);
           }
           // make it most recent instrument
           instrumentsSet.addLast(instrumentName);
         }
+
         function removeInstrument(instrumentName) {
-          if(hasInstrument(instrumentName)){
+          if (hasInstrument(instrumentName)) {
             var channelNumber = channelOfInstrument[instrumentName];
             delete channelOfInstrument[instrumentName];
             channelsConfig[channelNumber] = null;
@@ -259,9 +264,9 @@
           return deferredMidi.promise;
         }
 
-        var loadedMidi = loadInstruments(availableInstruments);
+        var loadedMidi = loadInstruments(availableInstruments.list);
         loadedMidi.then(function () {
-          availableInstruments.forEach(addInstrument);
+          availableInstruments.list.forEach(addInstrument);
           $log.debug("Channels config : ", channelsConfig);
           $log.debug("Channels of instrument : ", channelOfInstrument);
         });
@@ -273,15 +278,57 @@
           addInstrument(instrumentName);
 
           var channelNumber = channelOfInstrument[instrumentName];
-          MIDI.noteOn(channelNumber,pitch,velocity,delay);
-        }
-        function noteOff(instrumentName, pitch, delay) {
-          MIDI.noteOff(channelOfInstrument[instrumentName],pitch,delay);
+          MIDI.noteOn(channelNumber, pitch, velocity, delay);
         }
 
-        function playNote (noteOptions,withReceipt,invokeApply){
+        function noteOff(instrumentName, pitch, delay) {
+          MIDI.noteOff(channelOfInstrument[instrumentName], pitch, delay);
+        }
+
+        /**
+         * Advanced version of noteOn, taking an opts object an able to return a promise.
+         * @param opts
+         * @param withReceipt
+         * @param invokeApply
+         * @returns {{triggeredAt: *, opts: *, on: *}}
+         */
+        function noteOn2(opts, withReceipt, invokeApply) {
+          noteOn(opts.instrument, opts.pitch, opts.delay, opts.velocity);
+
+          if(withReceipt){
+            var triggeredAt = timeUtils.nowMillis();
+            return {
+              triggeredAt: triggeredAt,
+              opts: opts,
+              on: $timeout(function () {
+                return {
+                  elapsed: (timeUtils.nowMillis() - triggeredAt)
+                };
+              }, opts.delay, !!invokeApply)
+            };
+          }
+        }
+
+        function noteOff2(opts, withReceipt, invokeApply) {
+          noteOff(opts.instrument, opts.pitch, opts.delay);
+
+          if(withReceipt){
+            var triggeredAt = timeUtils.nowMillis();
+            return {
+              triggeredAt: triggeredAt,
+              opts: opts,
+              off: $timeout(function () {
+                return {
+                  elapsed: (timeUtils.nowMillis() - triggeredAt)
+                };
+              }, opts.delay, !!invokeApply)
+            };
+          }
+        }
+
+        function playNote(noteOptions, withReceipt, invokeApply) {
           var onDelay = (noteOptions.delay || defaultNoteOptions.delay),
-            offDelay=(noteOptions.delay || defaultNoteOptions.delay) + (noteOptions.duration || defaultNoteOptions.duration);
+            offDelay = (noteOptions.delay || defaultNoteOptions.delay) + (noteOptions.duration || defaultNoteOptions.duration);
           noteOn(
             (noteOptions.instrument || defaultNoteOptions.instrument),
             (noteOptions.pitch || defaultNoteOptions.pitch),
@@ -293,8 +340,8 @@
             (noteOptions.pitch || defaultNoteOptions.pitch),
             offDelay
           );
-          if(withReceipt){
-            var triggeredAt= timeUtils.nowMillis();
+          if (withReceipt) {
+            var triggeredAt = timeUtils.nowMillis();
             return {
               triggeredAt: triggeredAt,
               opts: noteOptions,
@@ -313,19 +360,21 @@
         }
 
         var millisUntil = timeUtils.millisUntil;
-        function playNoteAt(instrumentName, pitch, duration, dateMillis, velocity){
+
+        function playNoteAt(instrumentName, pitch, duration, dateMillis, velocity) {
           var delay = millisUntil(dateMillis);
-          playNote(instrumentName,pitch,duration,delay,velocity);
+          playNote(instrumentName, pitch, duration, delay, velocity);
         }
 
         return {
-          availableInstruments: availableInstruments,
           loadedMidi: loadedMidi,
           addInstrument: addInstrument,
           removeInstrument: removeInstrument,
           getCurrentInstruments: instrumentsSet.toArray,
           noteOn: noteOn,
           noteOff: noteOff,
+          noteOn2: noteOn2,
+          noteOff2: noteOff2,
           playNote: playNote,
           playNoteAt: playNoteAt
         };

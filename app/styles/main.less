@@ -1,7 +1,6 @@
 /* Space out content a bit */
 body {
-  padding-top: 70px;
-  padding-bottom: 20px;
+  padding: 70px 10px 20px;
 }
 
 .Clickable {
@@ -199,6 +198,8 @@ body {
   border-radius: 10000px;
   overflow: hidden;
 
+  margin: auto; //centering
+
   .ck_center{
     position: absolute;
     top: 50%;
@@ -220,4 +221,12 @@ body {
     }
   }
 
+}
+
+#cyclic-keyboard-page {
+  .cyclic-keyboard {
+    @ck_height: 450px;
+    height: @ck_height;
+    width: @ck_height;
+  }
 }
