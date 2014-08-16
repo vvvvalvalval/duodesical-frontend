@@ -53,15 +53,28 @@ angular.module('d12App')
 
 
       $log.debug("availableInstrumentsData = ", availableInstrumentsData);
-      $scope.instruments = availableInstrumentsData;
+      $scope.instruments = availableInstrumentsData.map(function (insData,index) {
+        var ins = Object.create(insData); // adding an index property
+        ins.index = index;
+        return ins;
+      });
 
       $scope.playerSettings = {
-        currentInstrument : availableInstrumentsData[0].midiName,
+        currentInstrument : $scope.instruments[0],
         sustainMode: false,
         duration: 600,
         velocity: 127
       };
       var pS = $scope.playerSettings;
+
+      $scope.toNextInstrument = function () {
+        var instruments = $scope.instruments, currentIndex = pS.currentInstrument.index, n = instruments.length;
+        pS.currentInstrument = instruments[(currentIndex + 1 + n) % n];
+      };
+      $scope.toPrevInstrument = function () {
+        var instruments = $scope.instruments, currentIndex = pS.currentInstrument.index, n = instruments.length;
+        pS.currentInstrument = instruments[(currentIndex - 1 + n) % n];
+      };
 
       var pitchesPlaying = [];
       var notesOnOff = [];
@@ -75,7 +88,7 @@ angular.module('d12App')
         if (pS.sustainMode){
           if(!notesOnOff[pitch]){
             var opts = {
-              instrument: pS.currentInstrument,
+              instrument: pS.currentInstrument.midiName,
               pitch: pitch,
               velocity: pS.velocity
             };
@@ -93,7 +106,7 @@ angular.module('d12App')
           }
         } else {
           var p = instruPlayer.playNote({
-            instrument: pS.currentInstrument,
+            instrument: pS.currentInstrument.midiName,
             pitch: pitch,
             duration: pS.duration / 1000,
             velocity: pS.velocity

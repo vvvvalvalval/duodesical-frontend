@@ -52,11 +52,24 @@
                     Instrument
                 </label>
                 <div class="col-sm-6">
-                    <select class="form-control" ng-model="playerSettings.currentInstrument">
-                        <option ng-repeat="ins in instruments" value="{{ins.midiName}}">
-                            {{ins.humanName}}
-                        </option>
-                    </select>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <button class="btn" ng-click="toPrevInstrument()">
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                        </div>
+                        <div class="col-xs-8">
+                            <select class="form-control"
+                                    ng-model="playerSettings.currentInstrument"
+                                    ng-options="ins.humanName for ins in instruments">
+                            </select>
+                        </div>
+                        <div class="col-xs-2">
+                            <button class="btn" ng-click="toNextInstrument()">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
